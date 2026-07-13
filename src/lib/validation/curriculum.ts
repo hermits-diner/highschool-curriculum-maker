@@ -31,6 +31,10 @@ export type ValidationSettings = {
   min_credits_per_semester: number;
   max_credits_per_semester: number;
   max_subjects_per_semester: number | null;
+  // 폐강 기준 자동 반영용 (없으면 해당 검사 생략)
+  min_students_to_open?: number;
+  classes_per_grade?: number;
+  default_section_capacity?: number;
 };
 
 export type SemesterSummary = {
@@ -204,6 +208,26 @@ export function validateCurriculum(input: {
         rule: "choice-single",
         message: `택1 그룹 「${key.split("::")[1]}」(${key.split("::")[0]})에 과목이 1개뿐입니다.`,
       });
+    }
+  }
+
+  // 0-2. 폐강 기준 자동 반영: 택1 그룹 대안 수가 예상 인원 대비 많으면 일부 폐강 위험
+  const minOpen = settings.min_students_to_open ?? 0;
+  const cohort =
+    (settings.classes_per_grade ?? 0) * (settings.default_section_capacity ?? 0);
+  if (minOpen > 0 && cohort > 0) {
+    for (const [key, group] of choiceGroups) {
+      const alternatives = group.length;
+      if (alternatives < 2) continue;
+      const perAlt = Math.floor(cohort / alternatives);
+      if (perAlt < minOpen) {
+        const [gs, gname] = key.split("::");
+        issues.push({
+          level: "warn",
+          rule: "choice-closure-risk",
+          message: `택1 그룹 「${gname}」(${gs}): 대안 ${alternatives}과목 · 학년 예상 ${cohort}명이면 균등 선택 시 대안당 약 ${perAlt}명으로 폐강 기준(${minOpen}명) 미달 위험. 폐강 없이 모두 개설하려면 학년 인원이 약 ${alternatives * minOpen}명 이상이어야 합니다.`,
+        });
+      }
     }
   }
 

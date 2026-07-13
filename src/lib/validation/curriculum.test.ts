@@ -264,4 +264,43 @@ describe("validateCurriculum", () => {
     expect(issues.some((i) => i.rule === "total-192")).toBe(true);
     expect(issues.some((i) => i.rule === "subject-174")).toBe(true);
   });
+
+  it("폐강 기준: 예상 인원 대비 택1 대안이 많으면 폐강 위험 경고", () => {
+    // 학년 예상 인원 = 2학급 × 3명 = 6명, 폐강 기준 13명 → 대안 2개면 대안당 3명 < 13
+    const small = {
+      ...settings,
+      min_students_to_open: 13,
+      classes_per_grade: 2,
+      default_section_capacity: 3,
+    };
+    const { issues } = validateCurriculum({
+      entries: validPlan(),
+      subjectsById,
+      settings: small,
+      prereqRules,
+    });
+    expect(issues.some((i) => i.rule === "choice-closure-risk")).toBe(true);
+  });
+
+  it("폐강 기준: 학년 인원이 충분하면 폐강 위험 경고 없음", () => {
+    const big = {
+      ...settings,
+      min_students_to_open: 13,
+      classes_per_grade: 10,
+      default_section_capacity: 30,
+    };
+    const { issues } = validateCurriculum({
+      entries: validPlan(),
+      subjectsById,
+      settings: big,
+      prereqRules,
+    });
+    expect(issues.some((i) => i.rule === "choice-closure-risk")).toBe(false);
+  });
+
+  it("폐강 기준 설정이 없으면 해당 검사를 생략한다", () => {
+    // 기존 settings(폐강 필드 없음) → choice-closure-risk 미발생
+    const { issues } = run(validPlan());
+    expect(issues.some((i) => i.rule === "choice-closure-risk")).toBe(false);
+  });
 });
