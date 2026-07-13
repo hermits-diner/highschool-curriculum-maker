@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type {
   CurriculumEntry,
   CurriculumPlan,
@@ -24,8 +24,6 @@ type LocalEntry = EntryInput & { key: string };
 
 const cellKey = (subjectId: string, grade: number, semester: number) =>
   `${subjectId}-${grade}-${semester}`;
-
-const TYPE_ORDER = ["공통", "일반선택", "진로선택", "융합선택", "창체"];
 
 export default function CurriculumEditor({
   plan,
@@ -292,20 +290,10 @@ function SemesterCell({
   onUpdate: (key: string, patch: Partial<LocalEntry>) => void;
   onRemove: (key: string) => void;
 }) {
-  const [picker, setPicker] = useState("");
-
-  const grouped = useMemo(() => {
-    const byType = new Map<string, Subject[]>();
-    for (const s of subjects) {
-      const list = byType.get(s.subject_type) ?? [];
-      list.push(s);
-      byType.set(s.subject_type, list);
-    }
-    return TYPE_ORDER.filter((t) => byType.has(t)).map((t) => ({
-      type: t,
-      subjects: byType.get(t)!,
-    }));
-  }, [subjects]);
+  const excludeIds = useMemo(
+    () => new Set(entries.map((e) => e.subject_id)),
+    [entries]
+  );
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-4 break-inside-avoid">
@@ -401,25 +389,149 @@ function SemesterCell({
 
       {!readOnly && (
         <div className="mt-3 print:hidden">
-          <select
-            value={picker}
-            onChange={(ev) => {
-              onAdd(grade, semester, ev.target.value);
-              setPicker("");
-            }}
-            className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-600 bg-slate-50"
-          >
-            <option value="">＋ 과목 추가...</option>
-            {grouped.map((g) => (
-              <optgroup key={g.type} label={g.type}>
-                {g.subjects.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} ({s.subject_group})
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
+          <SubjectPicker
+            subjects={subjects}
+            excludeIds={excludeIds}
+            onPick={(id) => onAdd(grade, semester, id)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+const TYPE_BADGE: Record<string, string> = {
+  공통: "bg-blue-50 text-blue-700",
+  일반선택: "bg-emerald-50 text-emerald-700",
+  진로선택: "bg-amber-50 text-amber-700",
+  융합선택: "bg-purple-50 text-purple-700",
+  창체: "bg-slate-100 text-slate-600",
+};
+
+/** 검색형 과목 추가 콤보박스 (156개 과목을 이름·교과군으로 검색) */
+function SubjectPicker({
+  subjects,
+  excludeIds,
+  onPick,
+}: {
+  subjects: Subject[];
+  excludeIds: Set<string>;
+  onPick: (subjectId: string) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
+  const boxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const avail = subjects
+      .filter((s) => !excludeIds.has(s.id))
+      .sort((a, b) => a.sort_order - b.sort_order);
+    if (!q) return avail.slice(0, 60);
+    return avail
+      .filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.subject_group.toLowerCase().includes(q) ||
+          s.subject_type.toLowerCase().includes(q)
+      )
+      .slice(0, 60);
+  }, [subjects, excludeIds, query]);
+
+  function pick(id: string) {
+    onPick(id);
+    setQuery("");
+    setActive(0);
+    setOpen(false);
+  }
+
+  return (
+    <div ref={boxRef} className="relative">
+      <div className="relative">
+        <svg
+          className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--faint)]"
+          width="14" height="14" viewBox="0 0 16 16" fill="none"
+          stroke="currentColor" strokeWidth="1.6" aria-hidden
+        >
+          <circle cx="7" cy="7" r="4.5" />
+          <path d="M10.5 10.5L14 14" strokeLinecap="round" />
+        </svg>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+            setActive(0);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              setOpen(true);
+              setActive((i) => Math.min(i + 1, results.length - 1));
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              setActive((i) => Math.max(i - 1, 0));
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              if (results[active]) pick(results[active].id);
+            } else if (e.key === "Escape") {
+              setOpen(false);
+            }
+          }}
+          placeholder="＋ 과목 검색·추가…"
+          className="w-full rounded-lg border border-slate-300 bg-[var(--surface-sunken)] pl-8 pr-2 py-1.5 text-xs text-slate-700 placeholder:text-[var(--faint)] focus:outline-none focus:border-[var(--accent)] focus:bg-white"
+        />
+      </div>
+
+      {open && (
+        <div className="absolute z-30 mt-1 w-full max-h-64 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-[var(--shadow-lg)] py-1">
+          {results.length === 0 ? (
+            <p className="px-3 py-2 text-xs text-[var(--faint)]">
+              검색 결과가 없습니다.
+            </p>
+          ) : (
+            results.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  pick(s.id);
+                }}
+                onMouseEnter={() => setActive(i)}
+                className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 ${
+                  i === active ? "bg-[var(--accent-soft)]" : "hover:bg-slate-50"
+                }`}
+              >
+                <span className="flex-1 truncate text-xs font-medium text-slate-800">
+                  {s.name}
+                  <span className="ml-1.5 font-normal text-[var(--faint)]">
+                    {s.subject_group}
+                  </span>
+                </span>
+                <span
+                  className={`shrink-0 text-[0.65rem] px-1.5 py-0.5 rounded ${
+                    TYPE_BADGE[s.subject_type] ?? ""
+                  }`}
+                >
+                  {s.subject_type}
+                </span>
+              </button>
+            ))
+          )}
         </div>
       )}
     </div>
