@@ -1,0 +1,58 @@
+{
+  "_comment": "기본 선수과목(위계) 규칙 시드. subject가 prerequisite 이수 후 수강. enforcement: required(신청 차단)|recommended(경고). 학교 규정에 맞게 화면에서 수정 가능.",
+  "rules": [
+    { "subject": "KOR-C2", "prerequisite": "KOR-C1", "enforcement": "required" },
+    { "subject": "MAT-C2", "prerequisite": "MAT-C1", "enforcement": "required" },
+    { "subject": "ENG-C2", "prerequisite": "ENG-C1", "enforcement": "required" },
+    { "subject": "SOC-KH2", "prerequisite": "SOC-KH1", "enforcement": "required" },
+    { "subject": "SOC-C2", "prerequisite": "SOC-C1", "enforcement": "required" },
+    { "subject": "SCI-C2", "prerequisite": "SCI-C1", "enforcement": "required" },
+    { "subject": "SCI-EX2", "prerequisite": "SCI-EX1", "enforcement": "required" },
+
+    { "subject": "KOR-G1", "prerequisite": "KOR-C2", "enforcement": "required" },
+    { "subject": "KOR-G2", "prerequisite": "KOR-C2", "enforcement": "required" },
+    { "subject": "KOR-G3", "prerequisite": "KOR-C2", "enforcement": "required" },
+
+    { "subject": "MAT-G1", "prerequisite": "MAT-C2", "enforcement": "required" },
+    { "subject": "MAT-G2", "prerequisite": "MAT-C2", "enforcement": "required" },
+    { "subject": "MAT-G3", "prerequisite": "MAT-C2", "enforcement": "required" },
+    { "subject": "MAT-J2", "prerequisite": "MAT-G2", "enforcement": "required" },
+    { "subject": "MAT-J2", "prerequisite": "MAT-G1", "enforcement": "recommended" },
+    { "subject": "MAT-J1", "prerequisite": "MAT-G2", "enforcement": "recommended" },
+    { "subject": "MAT-J3", "prerequisite": "MAT-G1", "enforcement": "recommended" },
+
+    { "subject": "ENG-G1", "prerequisite": "ENG-C2", "enforcement": "required" },
+    { "subject": "ENG-G2", "prerequisite": "ENG-G1", "enforcement": "recommended" },
+    { "subject": "ENG-G3", "prerequisite": "ENG-C2", "enforcement": "required" },
+    { "subject": "ENG-J3", "prerequisite": "ENG-G2", "enforcement": "recommended" },
+    { "subject": "ENG-J4", "prerequisite": "ENG-G3", "enforcement": "recommended" },
+
+    { "subject": "SCI-J1", "prerequisite": "SCI-G1", "enforcement": "recommended" },
+    { "subject": "SCI-J2", "prerequisite": "SCI-G1", "enforcement": "recommended" },
+    { "subject": "SCI-J3", "prerequisite": "SCI-G2", "enforcement": "recommended" },
+    { "subject": "SCI-J4", "prerequisite": "SCI-G2", "enforcement": "recommended" },
+    { "subject": "SCI-J5", "prerequisite": "SCI-G3", "enforcement": "recommended" },
+    { "subject": "SCI-J6", "prerequisite": "SCI-G3", "enforcement": "recommended" },
+    { "subject": "SCI-J7", "prerequisite": "SCI-G4", "enforcement": "recommended" },
+    { "subject": "SCI-J8", "prerequisite": "SCI-G4", "enforcement": "recommended" },
+
+    { "subject": "L2-J1", "prerequisite": "L2-G1", "enforcement": "recommended" },
+    { "subject": "L2-J2", "prerequisite": "L2-G2", "enforcement": "recommended" },
+    { "subject": "L2-J3", "prerequisite": "L2-G3", "enforcement": "recommended" },
+    { "subject": "L2-J4", "prerequisite": "L2-G4", "enforcement": "recommended" },
+    { "subject": "L2-J5", "prerequisite": "L2-G5", "enforcement": "recommended" },
+    { "subject": "L2-J6", "prerequisite": "L2-G6", "enforcement": "recommended" },
+    { "subject": "L2-J7", "prerequisite": "L2-G7", "enforcement": "recommended" },
+    { "subject": "L2-J8", "prerequisite": "L2-G8", "enforcement": "recommended" },
+    { "subject": "L2-J9", "prerequisite": "L2-G1", "enforcement": "recommended" },
+    { "subject": "L2-J10", "prerequisite": "L2-G2", "enforcement": "recommended" },
+    { "subject": "L2-J11", "prerequisite": "L2-G3", "enforcement": "recommended" },
+    { "subject": "L2-J12", "prerequisite": "L2-G4", "enforcement": "recommended" },
+    { "subject": "L2-J13", "prerequisite": "L2-G5", "enforcement": "recommended" },
+    { "subject": "L2-J14", "prerequisite": "L2-G6", "enforcement": "recommended" },
+    { "subject": "L2-J15", "prerequisite": "L2-G7", "enforcement": "recommended" },
+    { "subject": "L2-J16", "prerequisite": "L2-G8", "enforcement": "recommended" },
+
+    { "subject": "HAN-J1", "prerequisite": "HAN-G1", "enforcement": "recommended" }
+  ]
+}
