@@ -44,26 +44,54 @@ export default function LoginPage() {
   }
 
   const tabClass = (t: Tab) =>
-    `flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+    `flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
       tab === t
-        ? "bg-white text-slate-900 shadow-sm"
-        : "text-slate-500 hover:text-slate-700"
+        ? "bg-[var(--surface)] text-[var(--ink)] shadow-[var(--shadow-xs)]"
+        : "text-[var(--muted)] hover:text-[var(--ink-2)]"
     }`;
 
+  const inputCls =
+    "field py-2.5 focus:outline-none focus:border-[var(--accent)]";
+
   return (
-    <main className="flex flex-1 items-center justify-center p-4">
-      <div className="w-full max-w-sm">
+    <main className="relative flex flex-1 items-center justify-center p-4 overflow-hidden">
+      {/* 은은한 배경 앰비언스 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 55% at 50% 0%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%)",
+        }}
+      />
+      <div className="relative w-full max-w-[26rem]">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">
+          <div
+            className="mx-auto mb-4 grid place-items-center w-12 h-12 rounded-[14px] text-white shadow-[var(--shadow-md)]"
+            style={{ background: "var(--accent)" }}
+            aria-hidden
+          >
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M2.5 3.5h6M2.5 8h6M2.5 12.5h4"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+              <circle cx="12.5" cy="4" r="1.15" fill="currentColor" />
+              <circle cx="12.5" cy="9" r="1.15" fill="currentColor" />
+            </svg>
+          </div>
+          <h1 className="text-[1.65rem] font-bold text-[var(--ink)] tracking-tight">
             고교 교육과정 편성 시스템
           </h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-1.5 text-sm text-[var(--muted)]">
             2022 개정교육과정 · 고교학점제
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-xl mb-6">
+        <div className="card p-6 shadow-[var(--shadow-lg)]">
+          <div className="flex gap-1 p-1 bg-[var(--surface-sunken)] rounded-xl mb-6 border border-[var(--border)]">
             <button
               type="button"
               className={tabClass("student")}
@@ -83,9 +111,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {tab === "student" ? (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  학번
-                </label>
+                <label className="label">학번</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -93,40 +119,36 @@ export default function LoginPage() {
                   onChange={(e) => setStudentNo(e.target.value)}
                   placeholder="예: 10315"
                   required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className={inputCls}
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  이메일
-                </label>
+                <label className="label">이메일</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="이메일 주소"
                   required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className={inputCls}
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                비밀번호
-              </label>
+              <label className="label">비밀번호</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={inputCls}
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+              <p className="text-sm text-[var(--danger-ink)] bg-[var(--danger-soft)] rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
@@ -134,14 +156,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="btn btn-primary w-full py-2.5"
             >
-              {loading ? "로그인 중..." : "로그인"}
+              {loading ? "로그인 중…" : "로그인"}
             </button>
           </form>
         </div>
 
-        <p className="mt-6 text-center text-xs text-slate-400">
+        <p className="mt-6 text-center text-xs text-[var(--faint)]">
           계정이 없거나 비밀번호를 잊은 경우 담당 선생님께 문의하세요.
         </p>
       </div>

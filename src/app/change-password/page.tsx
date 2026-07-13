@@ -41,45 +41,43 @@ export default function ChangePasswordPage() {
     window.location.href = "/";
   }
 
+  const inputCls = "field py-2.5 focus:outline-none focus:border-[var(--accent)]";
+
   return (
     <main className="flex flex-1 items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <h1 className="text-lg font-bold text-slate-900">비밀번호 변경</h1>
-          <p className="mt-1 mb-6 text-sm text-slate-500">
+      <div className="w-full max-w-[24rem]">
+        <div className="card p-6 shadow-[var(--shadow-lg)]">
+          <h1 className="text-lg font-bold text-[var(--ink)]">비밀번호 변경</h1>
+          <p className="mt-1 mb-6 text-sm text-[var(--muted)]">
             처음 로그인하셨습니다. 계속하려면 새 비밀번호를 설정하세요.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                새 비밀번호 (8자 이상)
-              </label>
+              <label className="label">새 비밀번호 (8자 이상)</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={inputCls}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                새 비밀번호 확인
-              </label>
+              <label className="label">새 비밀번호 확인</label>
               <input
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 required
                 minLength={8}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={inputCls}
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+              <p className="text-sm text-[var(--danger-ink)] bg-[var(--danger-soft)] rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
@@ -87,9 +85,9 @@ export default function ChangePasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="btn btn-primary w-full py-2.5"
             >
-              {loading ? "변경 중..." : "비밀번호 변경"}
+              {loading ? "변경 중…" : "비밀번호 변경"}
             </button>
           </form>
         </div>

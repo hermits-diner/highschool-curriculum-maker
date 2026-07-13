@@ -50,44 +50,55 @@ export default async function StudentDashboard() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-slate-900">
-        {profile!.name} 님, 안녕하세요
-      </h1>
-      {student && (
-        <p className="mt-1 text-sm text-slate-500">
-          {student.grade
-            ? `${student.grade}학년 ${student.class_no}반 ${student.number}번`
-            : `학번 ${student.student_no}`}
-        </p>
-      )}
+      <header className="mb-8">
+        <h1 className="text-2xl font-bold text-[var(--ink)]">
+          {profile!.name} 님, 안녕하세요
+        </h1>
+        {student && (
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            {student.grade
+              ? `${student.grade}학년 ${student.class_no}반 ${student.number}번`
+              : `학번 ${student.student_no}`}
+          </p>
+        )}
+      </header>
 
-      <div className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="font-semibold text-slate-800">졸업 이수 진척</h2>
-          <span className="text-sm text-slate-500">
-            <span className="text-lg font-bold text-blue-600">{earned}</span> /
-            192학점
+      {/* 이수 진척 */}
+      <div className="card p-6">
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <h2 className="font-semibold text-[var(--ink)]">졸업 이수 진척</h2>
+            <p className="text-xs text-[var(--muted)] mt-0.5">
+              고교학점제 졸업 기준 192학점
+            </p>
+          </div>
+          <span className="text-sm text-[var(--muted)] tnum">
+            <span className="text-2xl font-bold text-[var(--accent)]">
+              {earned}
+            </span>
+            <span className="mx-1">/</span>192
           </span>
         </div>
-        <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+        <div className="h-2.5 rounded-full bg-[var(--surface-sunken)] overflow-hidden ring-1 ring-inset ring-[var(--border)]">
           <div
-            className="h-full bg-blue-500 rounded-full"
-            style={{ width: `${pct}%` }}
+            className="h-full rounded-full transition-[width] duration-500"
+            style={{ width: `${pct}%`, background: "var(--accent)" }}
           />
         </div>
-        <div className="mt-2 flex gap-4 text-xs text-slate-500">
-          <span>이수 {earned}학점</span>
-          <span>진행중 {inProgress}학점</span>
+        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs">
+          <Legend color="var(--accent)" label={`이수 ${earned}학점`} />
+          <Legend color="var(--border-strong)" label={`진행중 ${inProgress}학점`} />
           {notMet > 0 && (
-            <span className="text-red-600">미이수 {notMet}과목</span>
+            <Legend color="var(--danger)" label={`미이수 ${notMet}과목`} />
           )}
         </div>
       </div>
 
+      {/* 진행 중인 신청 */}
       <div className="mt-8">
-        <h2 className="font-semibold text-slate-800 mb-3">진행 중인 신청</h2>
+        <h2 className="font-semibold text-[var(--ink)] mb-3">진행 중인 신청</h2>
         {rounds.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-400">
+          <div className="card-dashed p-6 text-sm text-[var(--faint)]">
             현재 진행 중인 수요조사·수강신청이 없습니다.
           </div>
         ) : (
@@ -96,23 +107,26 @@ export default async function StudentDashboard() {
               <Link
                 key={r.id}
                 href={`/student/enroll/${r.id}`}
-                className="flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50/50 px-5 py-4 hover:border-blue-400 transition-colors"
+                className="group flex items-center justify-between rounded-[var(--radius)] border border-[color-mix(in_srgb,var(--accent)_28%,var(--border))] bg-[var(--accent-soft)] px-5 py-4 transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-[var(--ink)]">
                       {r.name}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                    <span className="badge badge-accent">
                       {ROUND_TYPE_LABEL[r.round_type]}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">
-                    마감: {fmt(r.closes_at)}
+                  <p className="text-xs text-[var(--muted)] mt-1 tnum">
+                    마감 {fmt(r.closes_at)}
                   </p>
                 </div>
-                <span className="text-blue-600 text-sm font-medium">
-                  신청하기 →
+                <span className="text-[var(--accent-ink)] text-sm font-semibold flex items-center gap-1">
+                  신청하기
+                  <span className="transition-transform group-hover:translate-x-0.5">
+                    →
+                  </span>
                 </span>
               </Link>
             ))}
@@ -120,26 +134,56 @@ export default async function StudentDashboard() {
         )}
       </div>
 
+      {/* 바로가기 */}
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <Link
+        <QuickLink
           href="/student/timetable"
-          className="rounded-xl border border-slate-200 bg-white p-5 hover:border-blue-400 transition-colors"
-        >
-          <h2 className="font-semibold text-slate-800">내 시간표</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            공개된 시간표에서 요일·교시별 수업과 강의실을 확인합니다.
-          </p>
-        </Link>
-        <Link
+          title="내 시간표"
+          desc="공개된 시간표에서 요일·교시별 수업과 강의실을 확인합니다."
+        />
+        <QuickLink
           href="/student/rooms"
-          className="rounded-xl border border-slate-200 bg-white p-5 hover:border-blue-400 transition-colors"
-        >
-          <h2 className="font-semibold text-slate-800">수강 과목 · 강의실</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            확정된 수강 과목과 배정 강의실·담당 교사를 확인합니다.
-          </p>
-        </Link>
+          title="수강 과목 · 강의실"
+          desc="확정된 수강 과목과 배정 강의실·담당 교사를 확인합니다."
+        />
       </div>
     </div>
+  );
+}
+
+function Legend({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="flex items-center gap-1.5 text-[var(--muted)]">
+      <span
+        className="w-2.5 h-2.5 rounded-full"
+        style={{ background: color }}
+      />
+      {label}
+    </span>
+  );
+}
+
+function QuickLink({
+  href,
+  title,
+  desc,
+}: {
+  href: string;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] hover:border-[color-mix(in_srgb,var(--accent)_35%,var(--border))]"
+    >
+      <h2 className="font-semibold text-[var(--ink)] flex items-center gap-1">
+        {title}
+        <span className="text-[var(--faint)] opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0">
+          →
+        </span>
+      </h2>
+      <p className="mt-1 text-sm text-[var(--muted)] leading-relaxed">{desc}</p>
+    </Link>
   );
 }
